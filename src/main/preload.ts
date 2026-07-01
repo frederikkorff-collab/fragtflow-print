@@ -5,7 +5,7 @@ import type { PollerStatus } from './poller'
 export type Bridge = {
   getSettings: () => Promise<Settings>
   saveSettings: (patch: Partial<Settings>) => Promise<Settings>
-  listPrinters: () => Promise<string[]>
+  listPrinters: () => Promise<Array<{ name: string; virtual: boolean }>>
   testConnection: () => Promise<{ ok: boolean; message: string }>
   getStatus: () => Promise<PollerStatus>
   onStatus: (cb: (s: PollerStatus) => void) => void

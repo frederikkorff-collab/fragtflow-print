@@ -17,7 +17,11 @@ const els = {
   test: $('test'),
   save: $('save'),
   refreshPrinters: $('refreshPrinters'),
+  showAllPrinters: $('showAllPrinters'),
 }
+
+// Cache of the last fetched printer list ([{ name, virtual }]).
+let allPrinters = []
 
 function setMsg(text, kind) {
   els.msg.textContent = text || ''
@@ -25,19 +29,32 @@ function setMsg(text, kind) {
 }
 
 async function loadPrinters(selected) {
-  const printers = await api.listPrinters()
+  allPrinters = await api.listPrinters()
+  // If the currently-selected printer is a virtual one, auto-show all so it
+  // stays visible and the toggle reflects reality.
+  const selectedIsVirtual = allPrinters.some((p) => p.name === selected && p.virtual)
+  if (selectedIsVirtual) els.showAllPrinters.checked = true
+  renderPrinterOptions(selected)
+}
+
+function renderPrinterOptions(selected) {
+  const showAll = els.showAllPrinters.checked
+  const sel = selected || ''
   els.printer.innerHTML = ''
   const optDefault = document.createElement('option')
   optDefault.value = ''
   optDefault.textContent = '(Server-standard)'
   els.printer.appendChild(optDefault)
-  for (const name of printers) {
+  for (const p of allPrinters) {
+    // Hide virtual printers unless "vis alle" is on — but never hide the one
+    // that's currently selected, so the saved value is never silently lost.
+    if (p.virtual && !showAll && p.name !== sel) continue
     const opt = document.createElement('option')
-    opt.value = name
-    opt.textContent = name
+    opt.value = p.name
+    opt.textContent = p.virtual ? `${p.name} (virtuel)` : p.name
     els.printer.appendChild(opt)
   }
-  els.printer.value = selected || ''
+  els.printer.value = sel
 }
 
 function renderStatus(s) {
@@ -67,6 +84,7 @@ async function init() {
 }
 
 els.refreshPrinters.addEventListener('click', () => loadPrinters(els.printer.value))
+els.showAllPrinters.addEventListener('change', () => renderPrinterOptions(els.printer.value))
 
 els.test.addEventListener('click', async () => {
   setMsg('Tester…', null)
