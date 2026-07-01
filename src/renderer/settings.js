@@ -19,7 +19,6 @@ const els = {
   printingBox: $('printingBox'),
   printingText: $('printingText'),
   jobList: $('jobList'),
-  jobsEmpty: $('jobsEmpty'),
   // settings form
   token: $('token'),
   stationName: $('stationName'),
