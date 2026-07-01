@@ -37,9 +37,10 @@ const status: PollerStatus = {
   recentJobs: [],
 }
 
-/** Human-friendly label for a job. The queue payload only carries id/document_type. */
-function jobName(job: { id: string; document_type: string | null }): string {
-  return (job.document_type && job.document_type.trim()) || job.id
+/** Human-friendly label for a job: prefer the server-provided `label` (recipient
+ * · tracking), then document_type, finally the job id. */
+function jobName(job: { id: string; document_type: string | null; label?: string | null }): string {
+  return (job.label && job.label.trim()) || (job.document_type && job.document_type.trim()) || job.id
 }
 
 /** Insert or update a recent job entry (keyed by id), newest first, capped. */

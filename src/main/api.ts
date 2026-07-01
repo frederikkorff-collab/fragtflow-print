@@ -7,6 +7,8 @@ export type PrintJob = {
   pdf_url: string
   document_type: string | null
   copies: number | null
+  /** Human-friendly label (e.g. "Frederik Korff · 08509…") for the status list. */
+  label: string | null
 }
 
 export type PollResult = {
